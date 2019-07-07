@@ -1,4 +1,5 @@
-# Define your WIN_COMBINATIONS constant
+
+
 WIN_COMBINATIONS = [
   [0,1,2],
   [3,4,5],
@@ -7,42 +8,25 @@ WIN_COMBINATIONS = [
   [1,4,7],
   [2,5,8],
   [0,4,8],
-  [6,4,2]
-]
+  [2,4,6]]
 
-def display_board(board)
-  puts " #{board[0]} | #{board[1]} | #{board[2]} "
-  puts "-----------"
-  puts " #{board[3]} | #{board[4]} | #{board[5]} "
-  puts "-----------"
-  puts " #{board[6]} | #{board[7]} | #{board[8]} "
+
+#OUTPUT BOARD
+def display_board(
+board = [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+  puts 'display board'
+#board output
+puts " #{board[0]} | #{board[1]} | #{board[2]} "
+puts "-----------"
+puts " #{board[3]} | #{board[4]} | #{board[5]} "
+puts "-----------"
+puts " #{board[6]} | #{board[7]} | #{board[8]} "
 end
 
-def input_to_index(user_input)
-  user_input.to_i - 1
-end
-
-def move(board, index, current_player)
-  board[index] = current_player
-end
-
-def position_taken?(board, index)
-  # basic solution:
-  taken = nil
-  if (board[index] ==  " " || board[index] == "" || board[index] == nil)
-    taken = false
-  else
-    taken = true
-  end
-  taken
-end
-
-def valid_move?(board, index)
-  index.between?(0,8) && !position_taken?(board, index)
-end
-
-def position_taken?(board, index)
-  board[index] != " "
+#CHANGE INFO TO INTEGER
+def input_to_index(move)
+   index = move.to_i - 1
+   index
 end
 
 #MAKE TURN
@@ -53,7 +37,7 @@ def turn(board)
   #input to index
   index = input_to_index(user_input)
   token = current_player(board)
-
+  
   #check for validation
   if valid_move?(board,index)
     puts 'valid move'
@@ -64,4 +48,131 @@ def turn(board)
     turn(board)
   end
   display_board(board)
+end
+
+#CHECK FOR EMPTY SPACE
+def position_taken?(board, index)
+  !(board[index].nil? || board[index] == " ")
+end
+
+#IS # CORRECT & SPACE EMPTY?
+def valid_move?(board, index)
+
+  if index.between?(0,8) && !position_taken?(board, index)
+      puts 'this is a valid move'
+    return true
+  else
+   return false
+  end
+end
+
+#COUNTER FOR PLAYER ASSESMENT
+def turn_count(board)
+  counter = 0
+  board.each do |space|
+    if space == "X" || space == "O"
+      counter +=1
+  end
+end
+return counter
+end
+
+#WHICH PLAYER IS THIS?
+def current_player(board)
+  if turn_count(board)%2 ==0
+    current_player = "X"
+  else
+    current_player = "O"
+end
+return current_player
+end
+
+
+#MAKE MOVE ON BOARD
+def move(board, index, token)
+  board[index] = token
+  play(board)
+  
+end
+
+
+
+
+
+#HAS ANYONE WON? return false if no. return win_combo if yes
+def won?(board)
+  WIN_COMBINATIONS.each do |win_combo|
+    #check for player 1 win
+    if check_win_combination?(board, 'X', win_combo)
+      return win_combo
+      #check for player 2 win
+    elsif check_win_combination?(board, 'O', win_combo)
+      return win_combo
+    else
+      return false
+    end
+  end
+end
+
+#CHECK WINNING COMBOS
+def check_win_combination?(board, player, win_combo)
+  win_combo.all? do |position|
+    board[position] == player
+  end
+end
+
+#IS BOARD FULL? 
+def full?(board)
+  if board.include?(' ') || board.include?('')
+    return false
+else
+    return true
+  end
+end
+
+#IS THERE A DRAW?
+def draw?(board)
+  if !won?(board) && full?(board)
+    return true
+  end
+end
+
+#HAS SOMETHING HAPPENED?
+def over?(board)
+  puts 'is it over?'
+  if won?(board) || draw?(board) || full?(board)
+    return true
+  else
+    puts 'no keep going'
+    return false
+  end
+end
+
+#WHO WON?
+def winner(board)
+  if !won?(board)
+    return nil
+  else WIN_COMBINATIONS.each do |win_combo|
+    if check_win_combination?(board, 'X', win_combo)
+      return 'X'
+    elsif check_win_combination?(board, 'O', win_combo)
+      return 'O'
+    end
+  end
+end
+end
+
+
+def play(board)
+  until over?(board) == true || won?(board) != false
+  puts 'turn'
+    turn(board)
+  end
+  if winner(board)
+    puts "Congratulations!"
+  elsif draw?(board)
+    puts "Draw!"
+  else
+    return nil
+  end
 end
